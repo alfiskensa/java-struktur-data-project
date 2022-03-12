@@ -19,28 +19,28 @@ public class HomeView extends VerticalLayout {
 	public HomeView() {
 		// TODO Auto-generated constructor stub
 		add(new Section(new Paragraph(
-				"This example app demonstrates how to call REST services and showing the results in a Vaadin Grid."),
+				"This example app demonstrates Structure Data Algorithm with example real data and Vaadin Framework."),
 				new Span("The sources for this application can be found "),
-				new Anchor("https://github.com/vaadin/vaadin-rest-example", "here.")));
+				new Anchor("https://github.com/alfiskensa/java-struktur-data-project", "here.")));
 
 		add(new Section(
-				new H2(new RouterLink("Calling a REST service using a DTO class for results", MasterStudentView.class)),
+				new H2(new RouterLink("Master Mahasiswa", MasterStudentView.class)),
 				new Paragraph(
-						"The first example uses a Data Transfer Object (DTO) class that we've created. Using a DTO is the standard way of calling REST services in Java, and this approach works well with Vaadin components as well.")));
+						"Menu untuk menambahkan Listing Data Mahasiswa.")));
 
-		add(new Section(new H2(new RouterLink("Calling a REST service with pure JSON results", MasterCourseView.class)),
+		add(new Section(new H2(new RouterLink("Master Course", MasterCourseView.class)),
 				new Paragraph(
-						"The second example does not use a DTO, but raw JSON instead using the Jackson library included with Spring. This approach works well when the received data is dynamic in nature, or you don't want to create a DTO.")));
+						"Menu untuk menambahankan Listing Data Course.")));
 
-		add(new Section(new H2(new RouterLink("Calling a REST service asynchronously", MasterScheduleView.class)),
+		add(new Section(new H2(new RouterLink("Master Jadwal", MasterScheduleView.class)),
 				new Paragraph(
-						"This example fetches the same data as the first example, but asychronously. This helps when the REST server is slow; starting the REST fetch does not block the application. The same method can be used with the second example as well, but not for lazy providers (the last example).")));
+						"Menu untuk menambahkan Listing Data jadwal tiap Course.")));
 
 		add(new Section(
-				new H2(new RouterLink("Creating a lazy loading (paging) DataProvider that uses REST",
+				new H2(new RouterLink("Absensi",
 						AbsentView.class)),
 				new Paragraph(
-						"The final example demonstrates how to create a lazy data provider for the Grid. Instead of fetching all results, we create a DataProvider that fetches only a portion of the data at a time. This approach works well for very big data sets that you don't want to load all at once.")));
+						"Menu untuk menampilkan data Absensi secara defaullt, menambah data absensi dan implementasi fitur Sorting and Search di dalamnya.")));
 
 	}
 }

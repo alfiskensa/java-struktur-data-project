@@ -6,7 +6,14 @@ public class SortUtil {
 
 	public enum SortType {ASC, DESC}
 	
-	// implementation sort algorithm using Quick Sort with Java Generic Type
+	/** implementation sort algorithm using Quick Sort with Java Generic Type
+	 * 
+	 * @param <T> is generic Type data
+	 * @param list is given array of data
+	 * @param c is custom comparator which used for campare each data
+	 * @param type is sort type for ascending or descending
+	 * @return list of sorted data
+	 */
 	public static <T> T[] sorts(T[] list, Comparator<T> c, SortType type) {
 		quicksort(list, 0, list.length-1, c, type);
 		return list;
