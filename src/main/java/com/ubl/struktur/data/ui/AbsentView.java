@@ -270,7 +270,7 @@ public class AbsentView extends Main {
 		});
 		courseCb.setItemLabelGenerator(s -> s.getCode() +" - "+s.getName());
 		courseCb.setWidthFull();
-		ComboBox<String> keteranganCb = new ComboBox<String>("Keterangan", Arrays.asList("Hadir", "Tidak Hadir"));
+		ComboBox<String> keteranganCb = new ComboBox<String>("", Arrays.asList("Hadir", "Tidak Hadir"));
 		keteranganCb.setWidthFull();
 		
 		binder = new Binder<Absent>(Absent.class);

@@ -1,5 +1,6 @@
 package com.ubl.struktur.data.service;
 
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;import java.util.Random;
@@ -11,6 +12,7 @@ import com.ubl.struktur.data.model.Absent;
 import com.ubl.struktur.data.model.Course;
 import com.ubl.struktur.data.model.Schedule;
 import com.ubl.struktur.data.model.Student;
+import com.ubl.struktur.data.util.CommonUtil;
 
 import lombok.Getter;
 
@@ -39,7 +41,12 @@ public class DataProvider {
 			Schedule schedule = new Schedule();
 			schedule.setId((int) Math.random());
 			schedule.setCourse(c);
-			schedule.setDate(new Date());
+			try {
+				schedule.setDate(CommonUtil.DATE_FORMAT.parse(CommonUtil.DATE_FORMAT.format(new Date())));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			schedules.add(schedule);
 		});
 		absents = new HashSet<Absent>();
