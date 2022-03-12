@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class Absent {
+public class Absent  {
 
 	private Integer id;
 	
@@ -13,4 +13,5 @@ public class Absent {
 	private Schedule schedule;
 	
 	private String description;
+	
 }
