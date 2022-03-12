@@ -69,7 +69,7 @@ public class MasterScheduleView extends AbstractMasterView<Schedule> {
 	public Binder<Schedule> getBinder() {
 		// TODO Auto-generated method stub
 		Binder<Schedule> binder = new Binder<Schedule>(Schedule.class);
-		binder.forField(id).withValidator((v,c) -> {
+		binder.forField(id).asRequired().withValidator((v,c) -> {
 			if(!StringUtils.isNumeric(v)) {
 				return ValidationResult.error("ID harus numerik");
 			} else {

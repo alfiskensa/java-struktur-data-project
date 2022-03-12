@@ -12,7 +12,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 
-@PageTitle("Vaadin REST Examples")
+@PageTitle("Stuktur Data Project - XB")
 @Route(value = "", layout = MainLayout.class)
 public class HomeView extends VerticalLayout {
 

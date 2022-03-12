@@ -71,6 +71,7 @@ public abstract class AbstractMasterView<T> extends Main {
 		saveBtn = new Button("Save");
 		saveBtn.setWidthFull();
 		saveBtn.addClickListener(e -> {
+			binder.validate();
 			if(binder.isValid()) {
 				T bean = binder.getBean();
 				if(!data.contains(bean))

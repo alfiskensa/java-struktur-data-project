@@ -5,12 +5,16 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ubl.struktur.data.model.Absent;
+import com.ubl.struktur.data.model.Course;
+import com.ubl.struktur.data.model.Schedule;
+import com.ubl.struktur.data.model.Student;
 import com.ubl.struktur.data.service.DataProvider;
 import com.ubl.struktur.data.util.CommonUtil;
 import com.ubl.struktur.data.util.SearchUtil;
@@ -18,7 +22,10 @@ import com.ubl.struktur.data.util.SortUtil;
 import com.ubl.struktur.data.util.SortUtil.SortType;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -27,6 +34,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -37,10 +45,14 @@ public class AbsentView extends Main {
 	private Grid<Absent> grid;
 	private TextField search;
 	private ComboBox<String> searchBy, sortBy;
-	private Button searchBt;
+	private Button searchBt, addBt;
 	private RadioButtonGroup<String> rbg;
 	
 	private static final List<String> FIELDS = Arrays.asList("NIM", "Nama Mahasiswa","Matakuliah","Jadwal","Keterangan");
+	
+	private Dialog formModal;
+	
+	private Binder<Absent> binder;
 	
 	@Autowired
 	private DataProvider dataProvider;
@@ -53,6 +65,10 @@ public class AbsentView extends Main {
 	@PostConstruct
 	private void init() {
 		loadData();
+		formModal = new Dialog(getAddAbsentFormLayout());
+		formModal.setModal(false);
+		formModal.setDraggable(true);
+		formModal.setOpened(false);
 	}
 	
 	private void initUI() {
@@ -93,15 +109,26 @@ public class AbsentView extends Main {
 			this.searchBy.clear();
 		});
 		
+		addBt = new Button("Tambah Data");
+		addBt.setThemeName("friendly");
+		addBt.addClickListener(e -> {
+			binder.setBean(new Absent());
+			formModal.open();
+		});
+		
 		HorizontalLayout h1 = new HorizontalLayout(searchBy,search,searchBt);
 		h1.setWidthFull();
 		h1.setVerticalComponentAlignment(Alignment.STRETCH, search);
 		h1.setVerticalComponentAlignment(Alignment.END, searchBt);
-		HorizontalLayout h2 = new HorizontalLayout(sortBy,rbg);
+		HorizontalLayout h2 = new HorizontalLayout(sortBy,rbg,addBt);
+		h2.setVerticalComponentAlignment(Alignment.END, addBt);
 		h2.setWidthFull();
 		hl.add(h1,h2);
 		hl.setVerticalComponentAlignment(Alignment.STRETCH, h1);
 		layout.add(hl,grid);
+		
+		
+		
 		setWidthFull();
 		add(layout);
 	}
@@ -206,5 +233,79 @@ public class AbsentView extends Main {
 			loadData();
 		grid.deselectAll();
 		grid.setItems(items);
+	}
+	
+	private VerticalLayout getAddAbsentFormLayout() {
+		VerticalLayout layout = new VerticalLayout();
+		layout.setWidth("500px");
+		
+		H2 headline = new H2("Tambah Absensi");
+		headline.getStyle().set("margin", "0").set("font-size", "1.5em").set("font-weight", "bold");
+		HorizontalLayout header = new HorizontalLayout(headline);
+		header.getElement().getClassList().add("draggable");
+		header.setSpacing(false);
+		header.getStyle().set("border-bottom", "1px solid var(--lumo-contrast-20pct)").set("cursor", "move");
+		// Use negative margins to make draggable header stretch over full width,
+		// covering the padding of the dialog
+		header.getStyle().set("padding", "var(--lumo-space-m) var(--lumo-space-l)").set("margin",
+				"calc(var(--lumo-space-s) * -1) calc(var(--lumo-space-l) * -1) 0");
+
+		
+		
+		FormLayout formLayout = new FormLayout();
+		formLayout.setWidthFull();
+		ComboBox<Schedule> scheculeCb = new ComboBox<Schedule>("");
+		scheculeCb.setItemLabelGenerator(s -> CommonUtil.DATE_FORMAT.format(s.getDate()));
+		scheculeCb.setWidthFull();
+		ComboBox<Student> studentCb = new ComboBox<Student>("", dataProvider.getStudents());
+		studentCb.setItemLabelGenerator(s -> s.getNim() +" - "+s.getName());
+		studentCb.setWidthFull();
+		ComboBox<Course> courseCb = new ComboBox<Course>("", dataProvider.getCourses());
+		courseCb.addValueChangeListener(e -> {
+			if (!e.getSource().isEmpty()) {
+				scheculeCb.setItems(dataProvider.getSchedules().stream()
+						.filter(p -> p.getCourse().getCode().equals(e.getValue().getCode()))
+						.collect(Collectors.toList()));
+			}
+		});
+		courseCb.setItemLabelGenerator(s -> s.getCode() +" - "+s.getName());
+		courseCb.setWidthFull();
+		ComboBox<String> keteranganCb = new ComboBox<String>("Keterangan", Arrays.asList("Hadir", "Tidak Hadir"));
+		keteranganCb.setWidthFull();
+		
+		binder = new Binder<Absent>(Absent.class);
+		binder.forField(scheculeCb).asRequired().bind("schedule");
+		binder.forField(studentCb).asRequired().bind("student");
+		binder.forField(keteranganCb).asRequired().bind("description");
+		binder.setBean(new Absent());
+		
+		formLayout.addFormItem(courseCb, "Matakuliah");
+		formLayout.addFormItem(scheculeCb, "Pilih Jadwal");
+		formLayout.addFormItem(studentCb, "Mahasiswa");
+		formLayout.addFormItem(keteranganCb, "Keterangan");
+		
+		Button saveBt = new Button("Simpan");
+		Button cancelBt = new Button("Batal");
+		saveBt.addClickListener(e -> {
+			if(binder.validate().isOk()) {
+				Absent bean = new Absent();
+				bean.setId((int)(Math.random() * 50 + 1));
+				binder.writeBeanIfValid(bean);
+				if(!dataProvider.getAbsents().contains(bean)) {
+					dataProvider.getAbsents().add(bean);
+				}
+				this.loadData();
+				this.formModal.close();
+				binder.setBean(null);
+			}
+		});
+		cancelBt.addClickListener(e -> {
+			binder.removeBean();
+			this.formModal.close();
+		});
+		saveBt.addThemeName("primary");
+		HorizontalLayout lyBt = new HorizontalLayout(cancelBt,saveBt);
+		layout.add(header,formLayout,lyBt);
+		return layout;
 	}
 }
